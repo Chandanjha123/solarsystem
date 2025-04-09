@@ -9,7 +9,7 @@ import { onAuthStateChanged, signOut } from "firebase/auth";
 import Background from './components/Background';
 import Sun from './components/planets/Sun';
 import Orbit from './components/Orbit';
-import "./components/PlanetInfo/PlanetinfoPopup.jsx";
+import "./components/PlanetInfo/PlanetInfoPopup.jsx";
 import './App.css';
 import About from './components/About';
 
