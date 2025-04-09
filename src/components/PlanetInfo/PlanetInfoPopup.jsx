@@ -1,5 +1,5 @@
 import React from "react";
-import "./PlanetInfoPopup.css"; // Import styles
+import "./PlanetinfoPopup.css"; // Import styles
 
 const PlanetInfoPopup = ({ name, size, rotation, revolution, distance, facts, onClose }) => {
   return (
