@@ -22,7 +22,6 @@ const Saturn = lazy(() => import('./components/planets/Saturn'));
 const Uranus = lazy(() => import('./components/planets/Uranus'));
 const Neptune = lazy(() => import('./components/planets/Neptune'));
 const Signup = lazy(() => import('./components/Signup'));
-const Asteroids = lazy(() => import("./components/planets/AsteroidModel"));
 
 // Lazy load planet info components
 const MercuryInfo = lazy(() => import("./components/PlanetInfo/MercuryInfo"));
