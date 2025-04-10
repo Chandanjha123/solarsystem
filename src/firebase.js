@@ -1,9 +1,9 @@
 // Import Firebase modules
 import { initializeApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider } from "firebase/auth";
-import { getFirestore } from "firebase/firestore"; // ✅ Import Firestore
+import { getFirestore } from "firebase/firestore";
 
-// Your Firebase config (replace with your own Firebase project credentials)
+// Your Firebase config
 const firebaseConfig = {
     apiKey: "AIzaSyCtZzafh8hXr0yszm7fMM4E5Ch5kvbGt6M",
     authDomain: "d-solar-system-48647.firebaseapp.com",
@@ -16,9 +16,12 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-const db = getFirestore(app); // ✅ Initialize Firestore
+const db = getFirestore(app);
 
-// Google OAuth Provider
+// Configure Google provider with additional scopes if needed
 const googleProvider = new GoogleAuthProvider();
+googleProvider.setCustomParameters({
+    prompt: "select_account"
+});
 
 export { auth, googleProvider, db };

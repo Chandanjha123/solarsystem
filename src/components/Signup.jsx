@@ -26,7 +26,6 @@ const Signup = () => {
 
         const handleAuthChange = async (user) => {
             if (user) {
-                // Add slight delay to allow Google popup to complete
                 timeoutId = setTimeout(() => {
                     navigate("/");
                 }, 1000);
@@ -41,13 +40,11 @@ const Signup = () => {
         };
     }, [navigate]);
 
-
     useEffect(() => {
-        // Comet animation logic - fixed to properly limit count
         const shootingStarsContainer = document.querySelector(".comets");
         let cometCount = 0;
-        const maxComets = 20 + Math.floor(Math.random() * 5); // Random between 10-15
-    
+        const maxComets = 20 + Math.floor(Math.random() * 5);
+
         function createComet() {
             if (cometCount >= maxComets) return;
             
@@ -68,50 +65,42 @@ const Signup = () => {
                 cometCount--;
             });
         }
-    
-        // Create initial comets (limited to maxComets)
+
         for (let i = 0; i < maxComets; i++) {
             createComet();
         }
-    
-        // Fixed interval logic - only create new comets if under limit
+
         const interval = setInterval(() => {
             const currentComets = document.querySelectorAll(".comet").length;
             if (currentComets < maxComets) {
                 createComet();
             }
-        }, 1000); // Check every second
-    
-        // Twinkling stars logic remains unchanged
+        }, 1000);
+
         const starsContainer = starsContainerRef.current;
         if (starsContainer) {
             starsContainer.innerHTML = '';
             
-            // Generate twinkling stars with more realistic properties
             for (let i = 0; i < 200; i++) {
-                const star = document.createElement("div"); // Fixed typo: was "stars"
+                const star = document.createElement("div");
                 const colors = ['white', '#f5f5f5', '#d4e6f7', '#f7e3d4', '#e3d4f7'];
                 const randomColor = colors[Math.floor(Math.random() * colors.length)];
                 star.style.backgroundColor = randomColor;
                 star.className = "star";
                 
-                // Random positioning
                 star.style.top = `${Math.random() * 100}vh`;
                 star.style.left = `${Math.random() * 100}vw`;
                 
-                // Random sizes (some bigger, some smaller)
                 const size = Math.random() > 0.9 ? 
-                    `${1 + Math.random() * 2}px` :  // 10% chance of being bigger
-                    `${0.5 + Math.random() * 0.5}px`; // 90% smaller stars
+                    `${1 + Math.random() * 2}px` :
+                    `${0.5 + Math.random() * 0.5}px`;
                 
                 star.style.width = size;
                 star.style.height = size;
                 
-                // Random twinkle properties
                 star.style.animationDelay = `${Math.random() * 5}s`;
                 star.style.animationDuration = `${3 + Math.random() * 7}s`;
                 
-                // Random brightness (some stars brighter than others)
                 star.style.setProperty('--brightness', Math.random() * 0.8 + 0.2);
                 
                 starsContainer.appendChild(star);
@@ -120,7 +109,7 @@ const Signup = () => {
     
         return () => clearInterval(interval);
     }, []);
-    // Rest of your existing code remains exactly the same...
+
     const handleSignUp = async (e) => {
         e.preventDefault();
         try {
@@ -152,9 +141,7 @@ const Signup = () => {
     const handleSignIn = async (e) => {
         e.preventDefault();
         try {
-            const userCredential = await signInWithEmailAndPassword(auth, email, password);
-            const user = userCredential.user;
-            console.log("Logged in user:", user);
+            await signInWithEmailAndPassword(auth, email, password);
             navigate("/");
         } catch (error) {
             if (error.code === "auth/user-not-found" || error.code === "auth/wrong-password") {
@@ -164,29 +151,28 @@ const Signup = () => {
             }
         }
     };
-    const handleGoogleSignIn = async () => {
+
+    const handleGoogleSignIn = async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
         try {
-            // Clear any existing error messages
+            setIsGoogleAuthLoading(true);
             setErrorMessage("");
-            
-            // Explicitly wait for the sign-in to complete
-            const result = await signInWithPopup(auth, googleProvider);
-            const user = result.user;
-            
-            // Optional: You can add a small delay here if needed
-            await new Promise(resolve => setTimeout(resolve, 500));
-            
-            console.log("Google Sign-In Success:", user);
+            await signInWithPopup(auth, googleProvider);
         } catch (error) {
-            console.error("Google Sign-In Error:", error.message);
-            setErrorMessage("Failed to sign in with Google. Please try again.");
+            console.error("Google Sign-In Error:", error);
+            if (error.code === 'auth/popup-closed-by-user') {
+                setErrorMessage("Google sign-in popup was closed. Please try again.");
+            } else {
+                setErrorMessage("Failed to sign in with Google. Please try again.");
+            }
+        } finally {
+            setIsGoogleAuthLoading(false);
         }
     };
 
-
     return (
         <div className="container">
-            {/* Changed to use ref for stars container */}
             <div className="stars" ref={starsContainerRef}></div>
             <div className="comets"></div>
 
@@ -259,6 +245,7 @@ const Signup = () => {
                                     onChange={(e) => setPassword(e.target.value)}
                                     required
                                 />
+                                {errorMessage && <p className="error-message">{errorMessage}</p>}
                                 <div className="buttons">
                                     <button type="submit">SIGN UP</button>
                                 </div>
@@ -273,7 +260,10 @@ const Signup = () => {
                                         aria-label="Sign up with Google"
                                         type="button"
                                         onClick={handleGoogleSignIn}
-                                    ></button>
+                                        disabled={isGoogleAuthLoading}
+                                    >
+                                        {isGoogleAuthLoading ? "Loading..." : ""}
+                                    </button>
                                 </div>
                             </>
                         )}
