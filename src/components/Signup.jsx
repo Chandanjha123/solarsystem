@@ -6,6 +6,7 @@ import {
   signInWithEmailAndPassword,
   signInWithPopup,
   onAuthStateChanged,
+  GoogleAuthProvider
 } from "firebase/auth";
 import { doc, setDoc, getDoc } from "firebase/firestore";
 import "./Signup.css";
@@ -22,20 +23,16 @@ const Signup = () => {
 
     useEffect(() => {
         let unsubscribe;
-        let timeoutId;
 
         const handleAuthChange = async (user) => {
             if (user) {
-                timeoutId = setTimeout(() => {
-                    navigate("/");
-                }, 1000);
+                navigate("/");
             }
         };
 
         unsubscribe = onAuthStateChanged(auth, handleAuthChange);
 
         return () => {
-            clearTimeout(timeoutId);
             if (unsubscribe) unsubscribe();
         };
     }, [navigate]);
@@ -158,7 +155,14 @@ const Signup = () => {
         try {
             setIsGoogleAuthLoading(true);
             setErrorMessage("");
-            await signInWithPopup(auth, googleProvider);
+            
+            // Create new provider instance each time
+            const provider = new GoogleAuthProvider();
+            provider.setCustomParameters({
+                prompt: 'select_account'
+            });
+            
+            await signInWithPopup(auth, provider);
         } catch (error) {
             console.error("Google Sign-In Error:", error);
             if (error.code === 'auth/popup-closed-by-user') {
