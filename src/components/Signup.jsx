@@ -266,7 +266,7 @@ const Signup = () => {
                                         onClick={handleGoogleSignIn}
                                         disabled={isGoogleAuthLoading}
                                     >
-                                        {isGoogleAuthLoading ? "Loading..." : ""}
+                                        {isGoogleAuthLoading ? "Loading.." : ""}
                                     </button>
                                 </div>
                             </>
