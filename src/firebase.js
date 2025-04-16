@@ -8,10 +8,11 @@ const firebaseConfig = {
     apiKey: "AIzaSyCtZzafh8hXr0yszm7fMM4E5Ch5kvbGt6M",
     authDomain: "d-solar-system-48647.firebaseapp.com",
     projectId: "d-solar-system-48647",
-    storageBucket: "d-solar-system-48647.appspot.com",
+    storageBucket: "d-solar-system-48647.firebasestorage.app",
     messagingSenderId: "134698403479",
     appId: "1:134698403479:web:db268c127bd2d574c40bd2",
-};
+    measurementId: "G-N8YLHVQ4YK"
+  };
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);

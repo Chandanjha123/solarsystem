@@ -153,28 +153,53 @@ const Signup = () => {
         e.preventDefault();
         e.stopPropagation();
         try {
-            setIsGoogleAuthLoading(true);
-            setErrorMessage("");
-            
-            // Create new provider instance each time
-            const provider = new GoogleAuthProvider();
-            provider.setCustomParameters({
-                prompt: 'select_account'
+          setIsGoogleAuthLoading(true);
+          setErrorMessage("");
+          
+          const provider = new GoogleAuthProvider();
+          provider.setCustomParameters({
+            prompt: 'select_account'
+          });
+          
+          // For production debugging
+          if (window.location.hostname !== 'localhost') {
+            console.log('Production environment detected');
+          }
+          
+          const result = await signInWithPopup(auth, provider);
+          
+          // Check if user is new (just signed up)
+          const isNewUser = result.user.metadata.creationTime === result.user.metadata.lastSignInTime;
+          
+          if (isNewUser) {
+            // Handle new user registration if needed
+            await setDoc(doc(db, "users", result.user.uid), {
+              email: result.user.email,
+              displayName: result.user.displayName,
+              photoURL: result.user.photoURL,
+              createdAt: new Date()
             });
-            
-            await signInWithPopup(auth, provider);
+          }
+          
+          navigate("/");
         } catch (error) {
-            console.error("Google Sign-In Error:", error);
-            if (error.code === 'auth/popup-closed-by-user') {
-                setErrorMessage("Google sign-in popup was closed. Please try again.");
-            } else {
-                setErrorMessage("Failed to sign in with Google. Please try again.");
-            }
+          console.error("Google Sign-In Error:", error);
+          let errorMessage = "Failed to sign in with Google. Please try again.";
+          
+          if (error.code === 'auth/popup-closed-by-user') {
+            errorMessage = "Google sign-in popup was closed. Please try again.";
+          } else if (error.code === 'auth/network-request-failed') {
+            errorMessage = "Network error. Please check your connection.";
+          } else if (error.code === 'auth/unauthorized-domain') {
+            errorMessage = "Authentication error. Please contact support.";
+            console.error("Unauthorized domain - check Firebase authorized domains");
+          }
+          
+          setErrorMessage(errorMessage);
         } finally {
-            setIsGoogleAuthLoading(false);
+          setIsGoogleAuthLoading(false);
         }
-    };
-
+      };
     return (
         <div className="container">
             <div className="stars" ref={starsContainerRef}></div>
